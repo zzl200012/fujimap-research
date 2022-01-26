@@ -116,6 +116,9 @@ public:
   void setInteger(const char* kbuf, const size_t klen, const uint64_t value,
 		  const bool searchable = false); 
 
+  void setInt(std::string key, const uint64_t code);
+  uint64_t getInt(std::string key);
+
   /**
    * Build an index for registered key/value pairs which are not indexed.
    * @return true on success, or false on failure.

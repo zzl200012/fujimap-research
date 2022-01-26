@@ -89,6 +89,32 @@ void Fujimap::setInteger(const char* kbuf, const size_t klen,
   }
 }
 
+uint64_t Fujimap::getInt(string s) {
+  map<string, uint64_t>::const_iterator it = tmpEdges_.find(s);
+  if (it != tmpEdges_.end()){
+    return it->second;
+  }
+
+  const uint64_t id = getBlockID(s.c_str(), s.size());
+  for (vector< vector<FujimapBlock> >::const_reverse_iterator it2 = fbs_.rbegin();
+       it2 != fbs_.rend(); ++it2){
+    KeyEdge ke(s.c_str(), s.size(), 0, (*it2)[id].getSeed());
+    uint64_t ret = (*it2)[id].getVal(ke);
+    if (ret != NOTFOUND){
+      return ret;
+    }
+  }
+
+  return NOTFOUND;
+}
+
+void Fujimap::setInt(string key, const uint64_t code) {
+  tmpEdges_[key] = code;
+    if (tmpEdges_.size() == tmpN_){
+      build();
+    }
+}
+
 uint64_t Fujimap::getCode(const std::string& value){
   map<string, uint64_t>::const_iterator it = val2code_.find(value);
   if (it != val2code_.end()){
