@@ -36,7 +36,7 @@
 
 Todo
 
-<img src="./img/update.svg" style="zoom:50%;" />
+<img src="./img/update.svg" style="zoom:25%;" />
 
 ##### 查询
 
