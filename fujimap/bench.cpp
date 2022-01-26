@@ -24,7 +24,7 @@ double gettimeofday_sec()
 void run_fujimap(const uint64_t N){
   fujimap_tool::Fujimap fm;
   fm.initFP(0);
-  fm.initTmpN(N / 40);
+  fm.initTmpN(N);
   //fm.initEncodeType(fujimap_tool::GAMMA);
 
   char buf[100];
@@ -46,6 +46,10 @@ void run_fujimap(const uint64_t N){
   double t3 = gettimeofday_sec();
   fprintf(stderr, "fm  lookup: %f (%f)\n", t3 - t2, (t3 - t2) / N);
   cerr <<         "fm    size: " << fm.getWorkingSize() << endl;
+
+  fm.printInfo();
+
+
 
   //if (dummy == 77777){
   //  fprintf(stderr, "you're lucky!");

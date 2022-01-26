@@ -196,6 +196,17 @@ public:
    */
   std::string getEncodeTypeStr() const;
 
+  void printInfo() {
+    for (uint64_t i = 0; i < fbs_.size(); i++) {
+      std::cout << i << "\n";
+      auto fb = fbs_[i];
+      for (int j = 0; j < KEYBLOCK; j++) {
+        std::cout << fb[j].getBSize() << " ";
+      }
+      std::cout << std::endl;
+    }
+  }
+
 private:
   int build_(std::vector<std::pair<std::string, uint64_t> >& kvs, 
 	     FujimapBlock& fb);
