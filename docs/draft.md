@@ -10,7 +10,7 @@
 
 总结一下 fujimap 涉及到的技术：
 
-* 分层结构。buffer 输入，批量转化成空间、查询友好的 immutable part
+* 分层结构。buffer 输入，批量转化成空间、查询友好的 immutable part；immutable part 新旧分层，查询时从新往旧查
 * 近似计算。通过允许假阳性，极端压缩空间占用，同时保证较好的查询性能。从表现上来看，immutable part 类似一个能存 value 的 bloom filter
 * 数据分区。为了避免过高的内存峰值占用和计算耗时，将一个 batch 的数据分区后分别构建最小完美哈希+succinct 结构，从而缓解压力。另一个角度来讲，分成若干个无依赖关系的 partition 在构建时也能具备更好的并行性
 
