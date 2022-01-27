@@ -34,17 +34,27 @@
 
 ##### 更新
 
-Todo
+1. 是否需要立即可见？若不需要则直接写入 KeyFile 返回，若需要则插入 TmpEdges
+2. TmpEdges 是否已满？若未满则直接返回，否则进入 build 流程
+3. build 过程：
+   1. 将 TmpEdges 中所有 key/value pair 写入 KeyFile，并将 TmpEdges 清空
+   2. 对于 BlockN 个分区，分别从 KeyFile 中加载对应分区的 key/value pair，并构建对应的 block。在构建之前，对于每个 key/value pair，会生成一个中间结构 KeyEdge，其中包含 value 实际值和 R 个 uint64 类型的标记位，后者通过对 key 做哈希并进行一些处理得到
+   3. 清空 KeyFile，将生成的一个新 batch（即 BlockN 个 block）加入到 immutable part 的头部
 
 <img src="./img/update.svg" width="50%" height="50%" />
 
 ##### 查询
 
-Todo
+1. 先在 TmpEdges 中查找，如果找到则直接返回，否则进入 immutable part
+2. 使用与插入时同样的哈希处理对 key 进行变换得到与输入 key/value pair 相关联的 KeyEdge，后续用此结构进行查找
+3. 由新往旧遍历 immutable part 的 batches，对于每个 batch，先用 key 得到 blockId，再到对应的 block 中用上一步得到的 KeyEdge 搜索，如果找到对应 value 则直接返回。这里因为是从新往旧查，更新的 value 会覆盖老 value
+4. 遍历完整个 immutable part 后如果还没查到，则返回 not found
 
 <img src="./img/query.svg" width="50%" height="50%" />
 
 ### 性能
+
+
 
 ### 总结
 
