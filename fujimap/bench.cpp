@@ -218,7 +218,7 @@ void gen_config(vector<tuple<uint64_t, uint64_t, uint64_t, uint64_t> >& configs)
     tmpns.push_back(i);
   }
 
-  for (uint64_t i = 8; i <= 1024; i *= 2) {
+  for (uint64_t i = 8; i <= 4096; i *= 2) {
     blkns.push_back(i);
   }
 
@@ -226,7 +226,7 @@ void gen_config(vector<tuple<uint64_t, uint64_t, uint64_t, uint64_t> >& configs)
     for (auto b = 0; b < fps.size(); b++) {
       for (auto c = 0; c < tmpns.size(); c++) {
         for (auto d = 0; d < blkns.size(); d++) {
-          if (ns[a] == 100000000 /*&& tmpns[c] == 10000000*/ && fps[b] == 16 && blkns[d] == 128 && ns[a] >= tmpns[c]) {
+          if (ns[a] == 10000000 && tmpns[c] == 1000000 && fps[b] == 16 && (blkns[d] == 4096 || blkns[d] == 1024 || blkns[d] == 2048 || blkns[d] == 512) && ns[a] >= tmpns[c]) {
             configs.push_back(tuple<uint64_t, uint64_t, uint64_t, uint64_t>(ns[a], fps[b], tmpns[c], blkns[d]));
           }
         }
@@ -260,6 +260,7 @@ int main(int argc, char* argv[]){
     f << a << " " << b << " " << c << " " << d << " ";
     auto [t1, t2, hit, size] = bench_fm(a, b, c, d);
     f << t1 << " " << t2 << " " << hit << " " << size << endl;
+    cout << "finished a round" << endl;
   }
   return 0;
 }
