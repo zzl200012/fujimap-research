@@ -70,12 +70,6 @@ void Fujimap::initEncodeType(const EncodeType et){
   et_ = et;
 }
 
-void Fujimap::setString(const char* kbuf, const size_t klen, 
-			const char* vbuf, const size_t vlen, 
-			const bool searchable){
-  setInteger(kbuf, klen, getCode(string(vbuf, vlen)), searchable);
-}
-
 void Fujimap::setInteger(const char* kbuf, const size_t klen, 
 			 const uint64_t code, const bool searchable){
   if (searchable){
@@ -86,44 +80,6 @@ void Fujimap::setInteger(const char* kbuf, const size_t klen,
   } else {
     uint64_t id = getBlockID(kbuf, klen);
     kf_.write(id, kbuf, klen, code);
-  }
-}
-
-uint64_t Fujimap::getInt(string s) {
-  map<string, uint64_t>::const_iterator it = tmpEdges_.find(s);
-  if (it != tmpEdges_.end()){
-    return it->second;
-  }
-
-  const uint64_t id = getBlockID(s.c_str(), s.size());
-  for (vector< vector<FujimapBlock> >::const_reverse_iterator it2 = fbs_.rbegin();
-       it2 != fbs_.rend(); ++it2){
-    KeyEdge ke(s.c_str(), s.size(), 0, (*it2)[id].getSeed());
-    uint64_t ret = (*it2)[id].getVal(ke);
-    if (ret != NOTFOUND){
-      return ret;
-    }
-  }
-
-  return NOTFOUND;
-}
-
-void Fujimap::setInt(string key, const uint64_t code) {
-  tmpEdges_[key] = code;
-    if (tmpEdges_.size() == tmpN_){
-      build();
-    }
-}
-
-uint64_t Fujimap::getCode(const std::string& value){
-  map<string, uint64_t>::const_iterator it = val2code_.find(value);
-  if (it != val2code_.end()){
-    return it->second;
-  } else {
-    uint32_t code = static_cast<uint32_t>(val2code_.size());
-    val2code_[value] = code;
-    code2val_.push_back(value);
-    return code;
   }
 }
 
@@ -233,16 +189,6 @@ string Fujimap::getEncodeTypeStr() const {
     return string("gamma"); 
   } else {
     return string("undefined");
-  }
-}
-
-const char* Fujimap::getString(const char* kbuf, const size_t klen, size_t& vlen) const {
-  uint64_t ret = getInteger(kbuf, klen);
-  if (ret != NOTFOUND && ret < code2val_.size()){
-    vlen = code2val_[ret].size();
-    return code2val_[ret].c_str();
-  } else {
-    return NULL; // NOTFOUND;
   }
 }
 

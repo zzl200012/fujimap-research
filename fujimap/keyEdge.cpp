@@ -119,7 +119,7 @@ uint64_t hash (const char* data_, size_t len)
 void hash(const char* str, size_t len, uint64_t seed,  
 	  uint64_t& a, uint64_t& b, uint64_t& c){
   const uint8_t* p = (const uint8_t*)(str);
-  a = 0x9e3779b97f4a7c13LL;
+  a = 0x9e3779b97f4a7c13LLU;
   b = seed;
   c = seed;
   while (len >= 24){

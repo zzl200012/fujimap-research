@@ -93,19 +93,6 @@ public:
   void initEncodeType(const EncodeType et);
 
   /**
-   * Set a record of key/value. 
-   * @param kbuf the pointer to the key region.
-   * @param klen the length of the key.
-   * @param vbuf the pointer to the value region.
-   * @param vlen the length of the value.
-   * @param searchable true if this record will be searchable immediately after this operation false 
-   * if this record will be searchable after build() is called (default: false).
-   */
-  void setString(const char* kbuf, const size_t klen, 
-		 const char* vbuf, const size_t vlen,
-		 const bool searchable = false);
-
-  /**
    * Set a record of key/value. This record will be searchable immediately after this operation.
    * @param kbuf the pointer to the key region.
    * @param klen the length of the key.
@@ -116,8 +103,12 @@ public:
   void setInteger(const char* kbuf, const size_t klen, const uint64_t value,
 		  const bool searchable = false); 
 
-  void setInt(std::string key, const uint64_t code);
-  uint64_t getInt(std::string key);
+  void setInteger(const std::string& key, const uint64_t value) {
+    tmpEdges_[key] = value;
+    if (tmpEdges_.size() == tmpN_){
+      build();
+    }
+  }    
 
   /**
    * Build an index for registered key/value pairs which are not indexed.
@@ -127,23 +118,31 @@ public:
   int build(); 
 
   /**
-   * Retrieve the string value for a key
-   * @param kbuf the pointer to the key region.
-   * @param klen the length of the key.
-   * @param vlen the length of the value.
-   * @return the pointer to the value region of the corresponding record, or NULL  on failure. 
-   * @note Because the pointer of the returned value is a member of fm, 
-   * a user should copy the returned value if using the returned value. 
-  */
-  const char* getString(const char* kbuf, const size_t klen, size_t& vlen) const;
-
-  /**
    * Retrieve the integer value for a key
    * @param kbuf the pointer to the key region.
    * @param klen the length of the key.
    * @return the interge value for a key, or fujimap::NOTFOUND on failure. 
   */
   uint64_t getInteger(const char* kbuf, const size_t klen) const;
+
+  uint64_t getInteger(const std::string& key) const {
+    auto it = tmpEdges_.find(key);
+    if (it != tmpEdges_.end()){
+      return it->second;
+    }
+    const char *kbuf = key.c_str();
+    const size_t klen = key.size();
+    const uint64_t id = getBlockID(kbuf, klen);
+    for (auto it2 = fbs_.rbegin(); it2 != fbs_.rend(); ++it2){
+      KeyEdge ke(kbuf, klen, 0, (*it2)[id].getSeed());
+      uint64_t ret = (*it2)[id].getVal(ke);
+      if (ret != NOTFOUND){
+        return ret;
+      }
+    }
+
+    return NOTFOUND;
+  }
 
 
   /**
@@ -215,8 +214,6 @@ private:
   void saveString(const std::string& s, std::ofstream& ofs) const; ///< Util for save
   void loadString(std::string& s, std::ifstream& ifs) const; ///< Util for load
   uint64_t getBlockID(const char* kbuf, const size_t len) const;
-  uint64_t getCode(const std::string& value); ///< Return corresponding code of a given value
-
   std::ostringstream what_; ///< Store a message
 
   std::map<std::string, uint64_t> val2code_; ///< Map from value to code
