@@ -184,7 +184,7 @@ delta = 1,625,444
 
 #### 总结
 
-这次更新主要是基于「纯内存性能符合预期」的前提下，对 fujimap 的内存表现进行了进一步实验。结果表明，总内存占用分为两部分：value part & fp bit part，分别和**每个 value 实际占用的 bit 数**以及 fplen 呈线性关系，两者系数一致。故而控制 fujimap 内存占用的关键在于：1）尽可能让每次 build 涉及到的 value 接近 2）仔细设置 false positive len
+这次更新主要是基于「纯内存性能符合预期」的前提下，对 fujimap 的内存表现进行了进一步实验。结果表明，总内存占用分为两部分：value part & fp bit part，分别和**每个 value 实际占用的 bit 数**以及 fplen 呈线性关系，两者系数一致，因此有 *memory = delta_k * (fplen + delta_value_bit)*。故而控制 fujimap 内存占用的关键在于：1）尽可能让每次 build 涉及到的 value 接近 2）仔细设置 false positive len
 
 
 
